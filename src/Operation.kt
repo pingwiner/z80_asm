@@ -167,6 +167,35 @@ class CPr8(val r: Reg8) : Operation(1, 1) {
     }
 }
 
+class CPn8(val n: UByte) : Operation(2, 2) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        return ubyteArrayOf(0xFEu, n)
+    }
+}
+
+class CPHL : Operation(1, 2) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        return ubyteArrayOf(0xBEu)
+    }
+}
+
+class CPIX(val offset: Byte) : Operation(3, 5) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        return ubyteArrayOf(0xDDu, 0xBEu, offset.toUByte())
+    }
+}
+
+class CPIY(val offset: Byte) : Operation(3, 5) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        return ubyteArrayOf(0xFDu, 0xBEu, offset.toUByte())
+    }
+}
+
+
 class JRNZ(val offset: Byte) : Operation(2, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {

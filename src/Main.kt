@@ -13,11 +13,8 @@ fun main() {
         //ld(A, 12)
         //ld(B, Mem[HL])
 
-        If(A gt B) {
+        If(A lt Mem[IY + 3]) {
             ld(A, 1)
-        }
-        If(A lt B) {
-            ld(A, 2)
         }
         nop()
         nop()

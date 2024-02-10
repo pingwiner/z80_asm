@@ -181,20 +181,19 @@ class CPHL : Operation(1, 2) {
     }
 }
 
-class CPIX(val offset: Byte) : Operation(3, 5) {
+sealed class CPxx(val prefix: UByte, val offset: Byte) : Operation(3, 5) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
-        return ubyteArrayOf(0xDDu, 0xBEu, offset.toUByte())
+        return ubyteArrayOf(prefix, 0xBEu, offset.toUByte())
     }
-}
-
-class CPIY(val offset: Byte) : Operation(3, 5) {
-    @OptIn(ExperimentalUnsignedTypes::class)
-    override fun bytes(): UByteArray {
-        return ubyteArrayOf(0xFDu, 0xBEu, offset.toUByte())
+    companion object {
+        fun create(indX: IndX): CPxx {
+            return if (indX.r == RegI.IX) CPIX(indX.offset) else CPIY(indX.offset)
+        }
     }
+    class CPIX(offset: Byte) : CPxx(0xDDu, offset)
+    class CPIY(offset: Byte) : CPxx(0xFDu, offset)
 }
-
 
 class JRNZ(val offset: Byte) : Operation(2, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)

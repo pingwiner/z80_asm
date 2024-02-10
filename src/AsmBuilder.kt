@@ -173,7 +173,7 @@ class AsmBuilder(val org: Int) {
         addOp(LDRA())
     }
 
-    fun If(condition: Condition, body: AsmBuilder.() -> Unit) {
+    fun If(condition: Generator, body: AsmBuilder.() -> Unit) {
         val startAddr = org + this.size
         val builder = AsmBuilder(startAddr).applyBody(body)
         val ifBlock = IfBlock(condition, startAddr, builder)
@@ -189,7 +189,7 @@ class AsmBuilder(val org: Int) {
     }
 }
 
-class IfBlock(val condition: Condition, val startAddr: Int, val builder: AsmBuilder)
+class IfBlock(val condition: Generator, val startAddr: Int, val builder: AsmBuilder)
 
 fun asm(org: Int = 0, initializer: AsmBuilder.() -> Unit): AsmBuilder {
     return AsmBuilder(org).apply(initializer)

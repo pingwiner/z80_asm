@@ -1,206 +1,43 @@
-sealed class Condition {
-    abstract fun ops(start: Int, offset: Int): List<Operation>
+interface Generator {
+    fun ops(start: Int, offset: Int): List<Operation>
+}
 
-// CP A, Reg8
+sealed class Condition<T : Operation>(val cmpOp: T) : Generator {
 
-    class EqReg8(val r8: Reg8) : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPr8(r8), JRNZ(offset.toByte()))
-            } else {
-                return listOf(CPr8(r8), JPNZ((start + 4 + offset).toUShort()))
-            }
-        }
-    }
-
-    class NeqReg8(val r8: Reg8) : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPr8(r8), JRZ(offset.toByte()))
-            } else {
-                return listOf(CPr8(r8), JPZ((start + 4 + offset).toUShort()))
-            }
-        }
-    }
-
-    class GtReg8(val r8: Reg8) : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 125) {
-                return listOf(CPr8(r8), JRZ((offset + 2).toByte()), JRC(offset.toByte()))
-            } else {
-                val targetAddr = (start + 7 + offset).toUShort()
-                return listOf(CPr8(r8), JPZ(targetAddr), JPC(targetAddr))
-            }
-        }
-    }
-
-    class GteReg8(val r8: Reg8) : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPr8(r8), JRC(offset.toByte()))
-            } else {
-                val targetAddr = (start + 4 + offset).toUShort()
-                return listOf(CPr8(r8), JPC(targetAddr))
-            }
-        }
-    }
-
-    class LtReg8(val r8: Reg8) : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPr8(r8), JRNC(offset.toByte()))
-            } else {
-                val targetAddr = (start + 4 + offset).toUShort()
-                return listOf(CPr8(r8), JPNC(targetAddr))
-            }
-        }
-    }
-
-// CP A, N8
-
-    class EqN8(val n: UByte) : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPn8(n), JRNZ(offset.toByte()))
-            } else {
-                return listOf(CPn8(n), JPNZ((start + 5 + offset).toUShort()))
-            }
-        }
-    }
-
-    class NeqN8(val n: UByte) : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPn8(n), JRZ(offset.toByte()))
-            } else {
-                return listOf(CPn8(n), JPZ((start + 5 + offset).toUShort()))
-            }
-        }
-    }
-
-    class GtN8(val n: UByte) : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 125) {
-                return listOf(CPn8(n), JRZ((offset + 2).toByte()), JRC(offset.toByte()))
-            } else {
-                val targetAddr = (start + 8 + offset).toUShort()
-                return listOf(CPn8(n), JPZ(targetAddr), JPC(targetAddr))
-            }
-        }
-    }
-
-    class GteN8(val n: UByte) : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPn8(n), JRC(offset.toByte()))
-            } else {
-                val targetAddr = (start + 5 + offset).toUShort()
-                return listOf(CPn8(n), JPC(targetAddr))
-            }
-        }
-    }
-
-    class LtN8(val n: UByte) : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPn8(n), JRNC(offset.toByte()))
-            } else {
-                val targetAddr = (start + 5 + offset).toUShort()
-                return listOf(CPn8(n), JPNC(targetAddr))
-            }
-        }
-    }
-
-    class EqHL : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPHL(), JRNZ(offset.toByte()))
-            } else {
-                return listOf(CPHL(), JPNZ((start + 4 + offset).toUShort()))
-            }
-        }
-    }
-
-    class NeqHL : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPHL(), JRZ(offset.toByte()))
-            } else {
-                return listOf(CPHL(), JPZ((start + 4 + offset).toUShort()))
-            }
-        }
-    }
-
-    class GtHL : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 125) {
-                return listOf(CPHL(), JRZ((offset + 2).toByte()), JRC(offset.toByte()))
-            } else {
-                val targetAddr = (start + 7 + offset).toUShort()
-                return listOf(CPHL(), JPZ(targetAddr), JPC(targetAddr))
-            }
-        }
-    }
-
-    class GteHL : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPHL(), JRC(offset.toByte()))
-            } else {
-                val targetAddr = (start + 4 + offset).toUShort()
-                return listOf(CPHL(), JPC(targetAddr))
-            }
-        }
-    }
-
-    class LtHL : Condition() {
-        override fun ops(start: Int, offset: Int): List<Operation> {
-            if (offset <= 127) {
-                return listOf(CPHL(), JRNC(offset.toByte()))
-            } else {
-                val targetAddr = (start + 4 + offset).toUShort()
-                return listOf(CPHL(), JPNC(targetAddr))
-            }
-        }
-    }
-
-
-    abstract class ConditionXY(val indX: IndX) : Condition() {
-        val cmpOp = if (indX.r == RegI.IX) CPIX(indX.offset) else CPIY(indX.offset)
-    }
-
-    class EqIXY(indX: IndX) : ConditionXY(indX) {
+    open class EqCondition<T : Operation>(cmpOp: T) : Condition<T>(cmpOp) {
         override fun ops(start: Int, offset: Int): List<Operation> {
             if (offset <= 127) {
                 return listOf(cmpOp, JRNZ(offset.toByte()))
             } else {
-                return listOf(cmpOp, JPNZ((start + 3 + cmpOp.size + offset).toUShort()))
+                val targetAddr = (start + 3 + cmpOp.size + offset).toUShort()
+                return listOf(cmpOp, JPNZ(targetAddr))
             }
         }
     }
 
-    class NeqIXY(indX: IndX) : ConditionXY(indX) {
+    open class NeqCondition<T : Operation>(cmpOp: T) : Condition<T>(cmpOp) {
         override fun ops(start: Int, offset: Int): List<Operation> {
             if (offset <= 127) {
                 return listOf(cmpOp, JRZ(offset.toByte()))
             } else {
-                return listOf(cmpOp, JPZ((start + 3 + cmpOp.size + offset).toUShort()))
+                val targetAddr = (start + 3 + cmpOp.size + offset).toUShort()
+                return listOf(cmpOp, JPZ(targetAddr))
             }
         }
     }
 
-    class GtIXY(indX: IndX) : ConditionXY(indX) {
+    open class GtCondition<T : Operation>(cmpOp: T) : Condition<T>(cmpOp) {
         override fun ops(start: Int, offset: Int): List<Operation> {
             if (offset <= 125) {
                 return listOf(cmpOp, JRZ((offset + 2).toByte()), JRC(offset.toByte()))
             } else {
-                val targetAddr = (start + 6 + cmpOp.size + offset).toUShort()
+                val targetAddr = (start + 3 * 2 + cmpOp.size + offset).toUShort()
                 return listOf(cmpOp, JPZ(targetAddr), JPC(targetAddr))
             }
         }
     }
 
-    class GteIXY(indX: IndX) : ConditionXY(indX) {
+    open class GteCondition<T : Operation>(cmpOp: T) : Condition<T>(cmpOp) {
         override fun ops(start: Int, offset: Int): List<Operation> {
             if (offset <= 127) {
                 return listOf(cmpOp, JRC(offset.toByte()))
@@ -211,7 +48,7 @@ sealed class Condition {
         }
     }
 
-    class LtIXY(indX: IndX) : ConditionXY(indX) {
+    open class LtCondition<T : Operation>(cmpOp: T) : Condition<T>(cmpOp) {
         override fun ops(start: Int, offset: Int): List<Operation> {
             if (offset <= 127) {
                 return listOf(cmpOp, JRNC(offset.toByte()))
@@ -221,90 +58,125 @@ sealed class Condition {
             }
         }
     }
+
+    // CP A, Reg8
+    class EqReg8(r8: Reg8) : EqCondition<CPr8>(CPr8(r8))
+    class NeqReg8(r8: Reg8) : NeqCondition<CPr8>(CPr8(r8))
+    class GtReg8(r8: Reg8) : GtCondition<CPr8>(CPr8(r8))
+    class GteReg8(r8: Reg8) : GteCondition<CPr8>(CPr8(r8))
+    class LtReg8(r8: Reg8) : LtCondition<CPr8>(CPr8(r8))
+
+
+    // CP A, N8
+
+    class EqN8(val n: UByte) : EqCondition<CPn8>(CPn8(n))
+    class NeqN8(val n: UByte) : NeqCondition<CPn8>(CPn8(n))
+    class GtN8(val n: UByte) : GtCondition<CPn8>(CPn8(n))
+    class GteN8(val n: UByte) : GteCondition<CPn8>(CPn8(n))
+    class LtN8(val n: UByte) : LtCondition<CPn8>(CPn8(n))
+
+
+    // CP A, [HL]
+
+    class EqHL : EqCondition<CPHL>(CPHL())
+    class NeqHL : NeqCondition<CPHL>(CPHL())
+    class GtHL : GtCondition<CPHL>(CPHL())
+    class GteHL : GteCondition<CPHL>(CPHL())
+    class LtHL : LtCondition<CPHL>(CPHL())
+
+
+    //CP A, [IX + d]
+    //CP A, [IY + d]
+
+    class EqIXY(indX: IndX) : EqCondition<CPxx>(CPxx.create(indX))
+    class NeqIXY(indX: IndX) : NeqCondition<CPxx>(CPxx.create(indX))
+    class GtIXY(indX: IndX) : GtCondition<CPxx>(CPxx.create(indX))
+    class GteIXY(indX: IndX) : GteCondition<CPxx>(CPxx.create(indX))
+    class LtIXY(indX: IndX) : LtCondition<CPxx>(CPxx.create(indX))
 }
 
-infix fun Reg8.A.eq(r8: Reg8): Condition {
+infix fun Reg8.A.eq(r8: Reg8): Condition<CPr8> {
     return Condition.EqReg8(r8)
 }
 
-infix fun Reg8.A.neq(r8: Reg8): Condition {
+infix fun Reg8.A.neq(r8: Reg8): Condition<CPr8> {
     return Condition.NeqReg8(r8)
 }
 
-infix fun Reg8.A.gt(r8: Reg8): Condition {
+infix fun Reg8.A.gt(r8: Reg8): Condition<CPr8> {
     return Condition.GtReg8(r8)
 }
 
-infix fun Reg8.A.lt(r8: Reg8): Condition {
+infix fun Reg8.A.lt(r8: Reg8): Condition<CPr8> {
     return Condition.LtReg8(r8)
 }
 
-infix fun Reg8.A.gte(r8: Reg8): Condition {
+infix fun Reg8.A.gte(r8: Reg8): Condition<CPr8> {
     return Condition.GteReg8(r8)
 }
 
 
-infix fun Reg8.A.eq(n8: UByte): Condition {
+infix fun Reg8.A.eq(n8: UByte): Condition<CPn8> {
     return Condition.EqN8(n8)
 }
 
-infix fun Reg8.A.neq(n8: UByte): Condition {
+infix fun Reg8.A.neq(n8: UByte): Condition<CPn8> {
     return Condition.NeqN8(n8)
 }
 
-infix fun Reg8.A.gt(n8: UByte): Condition {
+infix fun Reg8.A.gt(n8: UByte): Condition<CPn8> {
     return Condition.GtN8(n8)
 }
 
-infix fun Reg8.A.lt(n8: UByte): Condition {
+infix fun Reg8.A.lt(n8: UByte): Condition<CPn8> {
     return Condition.LtN8(n8)
 }
 
-infix fun Reg8.A.gte(n8: UByte): Condition {
+infix fun Reg8.A.gte(n8: UByte): Condition<CPn8> {
     return Condition.GteN8(n8)
 }
 
 
 //CP A, [HL]
 
-infix fun Reg8.A.eq(hl: Ind.HL): Condition {
+infix fun Reg8.A.eq(hl: Ind.HL): Condition<CPHL> {
     return Condition.EqHL()
 }
 
-infix fun Reg8.A.neq(hl: Ind.HL): Condition {
+infix fun Reg8.A.neq(hl: Ind.HL): Condition<CPHL> {
     return Condition.NeqHL()
 }
 
-infix fun Reg8.A.gt(hl: Ind.HL): Condition {
+infix fun Reg8.A.gt(hl: Ind.HL): Condition<CPHL> {
     return Condition.GtHL()
 }
 
-infix fun Reg8.A.lt(hl: Ind.HL): Condition {
+infix fun Reg8.A.lt(hl: Ind.HL): Condition<CPHL> {
     return Condition.LtHL()
 }
 
-infix fun Reg8.A.gte(hl: Ind.HL): Condition {
+infix fun Reg8.A.gte(hl: Ind.HL): Condition<CPHL> {
     return Condition.GteHL()
 }
 
 //CP A, [IX + d]
 
-infix fun Reg8.A.eq(indX: IndX): Condition {
+infix fun Reg8.A.eq(indX: IndX): Condition<CPxx> {
     return Condition.EqIXY(indX)
 }
 
-infix fun Reg8.A.neq(indX: IndX): Condition {
+infix fun Reg8.A.neq(indX: IndX): Condition<CPxx> {
     return Condition.NeqIXY(indX)
 }
 
-infix fun Reg8.A.gt(indX: IndX): Condition {
+infix fun Reg8.A.gt(indX: IndX): Condition<CPxx> {
     return Condition.GtIXY(indX)
 }
 
-infix fun Reg8.A.lt(indX: IndX): Condition {
+infix fun Reg8.A.lt(indX: IndX): Condition<CPxx> {
     return Condition.LtIXY(indX)
 }
 
-infix fun Reg8.A.gte(indX: IndX): Condition {
+infix fun Reg8.A.gte(indX: IndX): Condition<CPxx> {
     return Condition.GteIXY(indX)
 }

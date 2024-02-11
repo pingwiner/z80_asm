@@ -88,11 +88,11 @@ sealed class Condition<T : Operation>(val cmpOp: T) : Generator {
     //CP A, [IX + d]
     //CP A, [IY + d]
 
-    class EqIXY(indX: IndX) : EqCondition<CPxx>(CPxx.create(indX))
-    class NeqIXY(indX: IndX) : NeqCondition<CPxx>(CPxx.create(indX))
-    class GtIXY(indX: IndX) : GtCondition<CPxx>(CPxx.create(indX))
-    class GteIXY(indX: IndX) : GteCondition<CPxx>(CPxx.create(indX))
-    class LtIXY(indX: IndX) : LtCondition<CPxx>(CPxx.create(indX))
+    class EqIXY(indX: IndX) : EqCondition<CPxx>(CPxx(indX))
+    class NeqIXY(indX: IndX) : NeqCondition<CPxx>(CPxx(indX))
+    class GtIXY(indX: IndX) : GtCondition<CPxx>(CPxx(indX))
+    class GteIXY(indX: IndX) : GteCondition<CPxx>(CPxx(indX))
+    class LtIXY(indX: IndX) : LtCondition<CPxx>(CPxx(indX))
 }
 
 infix fun Reg8.A.eq(r8: Reg8): Condition<CPr8> {

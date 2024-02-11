@@ -1,3 +1,4 @@
+import java.security.InvalidParameterException
 
 class AsmBuilder(val org: Int) {
     private val ops = mutableListOf<Operation>()
@@ -173,6 +174,34 @@ class AsmBuilder(val org: Int) {
         addOp(LDRA())
     }
 
+    fun ld(r1: Reg8.A, ub: ByteVar) {
+        addOp(LDAMM(ub.address))
+    }
+
+    fun ld(ub: ByteVar, r1: Reg8.A) {
+        addOp(LDMMA(ub.address))
+    }
+
+    fun ld(hl: Reg16.HL, w: WordVar) {
+        addOp(LDHLMM(w.address))
+    }
+
+    fun ld(w: WordVar, hl: Reg16.HL) {
+        addOp(LDMMHL(w.address))
+    }
+
+    fun ld(r: Reg16, imm: UShort) {
+        addOp(LDr16n16(r, imm))
+    }
+
+    fun ld(r: RegI, imm: UShort) {
+        addOp(LDrIn16(r, imm))
+    }
+
+    fun ld(hl: Reg16.HL, addr: Address) {
+        addOp(LDHLMM(addr.addr))
+    }
+
     fun If(condition: Generator, body: AsmBuilder.() -> Unit) {
         val startAddr = org + this.size
         val builder = AsmBuilder(startAddr).applyBody(body)
@@ -187,6 +216,46 @@ class AsmBuilder(val org: Int) {
     fun nop() {
         addOp(NOP())
     }
+
+    fun loop(b: Reg8.B, body: AsmBuilder.() -> Unit) {
+        val startAddr = org + this.size
+        val builder = AsmBuilder(startAddr).applyBody(body)
+        val offset = builder.size + 2
+        if (offset < 129) {
+            builder.addOp(DJNZ((-offset).toByte()))
+        } else {
+            throw InvalidParameterException("Jump range is too long")
+        }
+        ops.addAll(builder.ops)
+    }
+
+    fun dup(count: Int, body: AsmBuilder.() -> Unit) {
+        val startAddr = org
+        for (i in 0..<count) {
+            val builder = AsmBuilder(startAddr + this.size).applyBody(body)
+            ops.addAll(builder.ops)
+        }
+    }
+
+    fun db(vararg bytes: Byte) {
+        for (b in bytes) {
+            addOp(DB(b.toUByte()))
+        }
+    }
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    fun db(vararg bytes: UByte) {
+        for (b in bytes) {
+            addOp(DB(b))
+        }
+    }
+
+    fun db(s: String) {
+        for (c in s) {
+            addOp(DB(c.code.toUByte()))
+        }
+    }
+
 }
 
 class IfBlock(val condition: Generator, val startAddr: Int, val builder: AsmBuilder)
@@ -195,4 +264,9 @@ fun asm(org: Int = 0, initializer: AsmBuilder.() -> Unit): AsmBuilder {
     return AsmBuilder(org).apply(initializer)
 }
 
-
+class ByteVar(allocator: Allocator) {
+    val address: UShort = allocator.allocByte()
+}
+class WordVar(allocator: Allocator) {
+    val address: UShort = allocator.allocWord()
+}

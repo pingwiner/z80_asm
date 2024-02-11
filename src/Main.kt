@@ -7,15 +7,18 @@ import RegI.IX.plus
 
 @OptIn(ExperimentalUnsignedTypes::class)
 fun main() {
+    val allocator = Allocator(0xB000u)
+    var a1 = ByteVar(allocator)
+    var w1 = WordVar(allocator)
 
     val code = asm {
+
         //ld(A, B)
         //ld(A, 12)
         //ld(B, Mem[HL])
 
-        If(A lt Mem[IY + 3]) {
-            ld(A, 1)
-        }
+        ld(HL, 0x1234u)
+
         nop()
         nop()
         nop()

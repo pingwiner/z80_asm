@@ -8,17 +8,16 @@ sealed class Reg8(val bitmask: Int) {
     data object L: Reg8(5)
 }
 
-sealed class Reg16 {
-    data object AF : Reg16()
-    data object BC : Reg16()
-    data object DE : Reg16()
-    data object HL : Reg16()
-    data object SP : Reg16()
+sealed class Reg16(val bitmask: Int) {
+    data object BC : Reg16(0)
+    data object DE : Reg16(1)
+    data object HL : Reg16(2)
+    data object SP : Reg16(3)
 }
 
-sealed class RegI {
-    data object IX : RegI()
-    data object IY : RegI()
+sealed class RegI(val prefix: UByte) {
+    data object IX : RegI(0xDDu)
+    data object IY : RegI(0xFDu)
 
     infix operator fun RegI.plus(b: Byte): IndX {
         return IndX(this, b)
@@ -62,4 +61,25 @@ object Mem {
     operator fun get(addr: UShort): Address {
         return Address(addr)
     }
+}
+
+class Allocator(val startAddr: UInt) {
+    var offset: UInt = 0u
+    fun allocByte() : UShort {
+        val result = startAddr + offset
+        if (result > UShort.MAX_VALUE) {
+            throw IndexOutOfBoundsException("Address space overflow")
+        }
+        offset++
+        return result.toUShort()
+    }
+    fun allocWord() : UShort {
+        val result = startAddr + offset
+        if (result > UShort.MAX_VALUE) {
+            throw IndexOutOfBoundsException("Address space overflow")
+        }
+        offset += 2u
+        return result.toUShort()
+    }
+
 }

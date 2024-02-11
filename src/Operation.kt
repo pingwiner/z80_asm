@@ -117,6 +117,20 @@ class LDMMA(val addr: UShort) : Operation(3,4) {
     }
 }
 
+class LDHLMM(val addr: UShort) : Operation(3,5) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        return ubyteArrayOf(0x2Au, lowByte(addr), hiByte(addr))
+    }
+}
+
+class LDMMHL(val addr: UShort) : Operation(3,5) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        return ubyteArrayOf(0x22u, lowByte(addr), hiByte(addr))
+    }
+}
+
 class LDBCA : Operation(1,2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
@@ -159,6 +173,21 @@ class LDRA : Operation(2, 2) {
     }
 }
 
+class LDr16n16(val r: Reg16, val imm: UShort) : Operation(3,2) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        val opCode = ((r.bitmask shl 4) or 1).toUByte()
+        return ubyteArrayOf(opCode, lowByte(imm), hiByte(imm))
+    }
+}
+
+class LDrIn16(val r: RegI, val imm: UShort) : Operation(4,4) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        return ubyteArrayOf(r.prefix, 0x21u, lowByte(imm), hiByte(imm))
+    }
+}
+
 class CPr8(val r: Reg8) : Operation(1, 1) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
@@ -181,18 +210,14 @@ class CPHL : Operation(1, 2) {
     }
 }
 
-sealed class CPxx(val prefix: UByte, val offset: Byte) : Operation(3, 5) {
+class CPxx(indX: IndX) : Operation(3, 5) {
+    val prefix: UByte = indX.r.prefix
+    val offset: Byte = indX.offset
+
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(prefix, 0xBEu, offset.toUByte())
     }
-    companion object {
-        fun create(indX: IndX): CPxx {
-            return if (indX.r == RegI.IX) CPIX(indX.offset) else CPIY(indX.offset)
-        }
-    }
-    class CPIX(offset: Byte) : CPxx(0xDDu, offset)
-    class CPIY(offset: Byte) : CPxx(0xFDu, offset)
 }
 
 class JRNZ(val offset: Byte) : Operation(2, 3) {
@@ -270,4 +295,19 @@ class NOP : Operation(1, 1) {
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0u)
     }
+}
+
+class DJNZ(val offset: Byte): Operation(2,3) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        return ubyteArrayOf(0x10u, offset.toUByte())
+    }
+}
+
+class DB(val b: UByte): Operation(1, 0) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        return ubyteArrayOf(b)
+    }
+
 }

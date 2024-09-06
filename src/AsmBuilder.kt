@@ -78,11 +78,11 @@ class AsmBuilder(val org: Int) {
         get() = ops.sumOf { it.size }
 
     fun ld(r1: Reg8, r2: Reg8) {
-        addOp(LDr8r8(r1, r2))
+        addOp(LD_r8_r8(r1, r2))
     }
 
     fun ld(r1: Reg8, imm: UByte) {
-        addOp(LDr8n8(r1, imm))
+        addOp(LD_r8_n8(r1, imm))
     }
 
     fun ld(r1: Reg8, imm: Byte) {
@@ -91,47 +91,47 @@ class AsmBuilder(val org: Int) {
 
 
     fun ld(r1: Reg8, ind: Ind.HL) {
-        addOp(LDr8HL(r1))
+        addOp(LD_r8_HL(r1))
     }
 
     fun ld(r1: Reg8.A, ind: Ind.BC) {
-        addOp(LDABC())
+        addOp(LD_A_BC())
     }
 
     fun ld(r1: Reg8.A, ind: Ind.DE) {
-        addOp(LDADE())
+        addOp(LD_A_DE())
     }
 
     fun ld(r1: Reg8, indirect: IndX) {
         if (indirect.r == RegI.IX) {
-            addOp(LDr8IX(r1, indirect.offset))
+            addOp(LD_r8_IX(r1, indirect.offset))
         } else {
-            addOp(LDr8IY(r1, indirect.offset))
+            addOp(LD_r8_IY(r1, indirect.offset))
         }
     }
 
     fun ld(ind: Ind.HL, r1: Reg8) {
-        addOp(LDHLr8(r1))
+        addOp(LD_HL_r8(r1))
     }
 
     fun ld(ind: Ind.BC, r1: Reg8.A) {
-        addOp(LDBCA())
+        addOp(LD_BC_A())
     }
 
     fun ld(ind: Ind.DE, r1: Reg8.A) {
-        addOp(LDDEA())
+        addOp(LD_DE_A())
     }
 
     fun ld(indirect: IndX, r1: Reg8) {
         if (indirect.r == RegI.IX) {
-            addOp(LDIXr8(indirect.offset, r1))
+            addOp(LD_IX_r8(indirect.offset, r1))
         } else {
-            addOp(LDIYr8(indirect.offset, r1))
+            addOp(LD_IY_r8(indirect.offset, r1))
         }
     }
 
     fun ld(ind: Ind.HL, imm: UByte) {
-        addOp(LDHLn8(imm))
+        addOp(LD_HL_n8(imm))
     }
 
     fun ld(ind: Ind.HL, imm: Byte) {
@@ -140,9 +140,9 @@ class AsmBuilder(val org: Int) {
 
     fun ld(indX: IndX, imm: UByte) {
         if (indX.r == RegI.IX) {
-            addOp(LDIXn8(indX.offset, imm))
+            addOp(LD_IX_n8(indX.offset, imm))
         } else {
-            addOp(LDIYn8(indX.offset, imm))
+            addOp(LD_IY_n8(indX.offset, imm))
         }
     }
 
@@ -151,55 +151,91 @@ class AsmBuilder(val org: Int) {
     }
 
     fun ld(r1: Reg8.A, address: Address) {
-        addOp(LDAMM(address.addr))
+        addOp(LD_A_MM(address.addr))
     }
 
     fun ld(address: Address, r1: Reg8.A) {
-        addOp(LDMMA(address.addr))
+        addOp(LD_MM_A(address.addr))
     }
 
     fun ld(r1: Reg8.A, r2: I) {
-        addOp(LDAI())
+        addOp(LD_A_I())
     }
 
     fun ld(r1: Reg8.A, r2: R) {
-        addOp(LDAR())
+        addOp(LD_A_R())
     }
 
     fun ld(r1: I, r2: Reg8.A) {
-        addOp(LDIA())
+        addOp(LD_I_A())
     }
 
     fun ld(r1: R, r2: Reg8.A) {
-        addOp(LDRA())
+        addOp(LD_R_A())
     }
 
     fun ld(r1: Reg8.A, ub: ByteVar) {
-        addOp(LDAMM(ub.address))
+        addOp(LD_A_MM(ub.address))
     }
 
     fun ld(ub: ByteVar, r1: Reg8.A) {
-        addOp(LDMMA(ub.address))
+        addOp(LD_MM_A(ub.address))
     }
 
     fun ld(hl: Reg16.HL, w: WordVar) {
-        addOp(LDHLMM(w.address))
+        addOp(LD_HL_MM(w.address))
     }
 
     fun ld(w: WordVar, hl: Reg16.HL) {
-        addOp(LDMMHL(w.address))
+        addOp(LD_MM_HL(w.address))
     }
 
     fun ld(r: Reg16, imm: UShort) {
-        addOp(LDr16n16(r, imm))
+        addOp(LD_r16_n16(r, imm))
     }
 
     fun ld(r: RegI, imm: UShort) {
-        addOp(LDrIn16(r, imm))
+        addOp(LD_rI_n16(r, imm))
     }
 
     fun ld(hl: Reg16.HL, addr: Address) {
-        addOp(LDHLMM(addr.addr))
+        addOp(LD_HL_MM(addr.addr))
+    }
+
+    fun ld(r: Reg16, addr: Address) {
+        addOp(LD_r16_MM(r, addr.addr))
+    }
+
+    fun ld(r: Reg16, w: WordVar) {
+        addOp(LD_r16_MM(r, w.address))
+    }
+
+    fun ld(addr: Address, r: Reg16) {
+        addOp(LD_MM_r16(addr.addr, r))
+    }
+
+    fun ld(w: WordVar, r: Reg16) {
+        addOp(LD_MM_r16(w.address, r))
+    }
+
+    fun ld(r: RegI, addr: Address) {
+        addOp(LD_rI_MM(r, addr.addr))
+    }
+
+    fun ld(r: RegI, w: WordVar) {
+        addOp(LD_rI_MM(r, w.address))
+    }
+
+    fun ld(addr: Address, r: RegI) {
+        addOp(LD_MM_rI(addr.addr, r))
+    }
+
+    fun ld(w: WordVar, r: RegI) {
+        addOp(LD_MM_rI(w.address, r))
+    }
+
+    fun ld(sp: Reg16.SP, hl: Reg16.HL) {
+        addOp(LD_SP_HL())
     }
 
     fun If(condition: Generator, body: AsmBuilder.() -> Unit) {

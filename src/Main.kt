@@ -40,6 +40,7 @@ fun main() {
         ld(I, A)
         ld(R, A)
 */
+        ld(BC, w1)
     }
 
     println("${code.opCount} commands, ${code.cycles} machine cycles")

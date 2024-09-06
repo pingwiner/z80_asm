@@ -4,7 +4,7 @@ abstract class Operation(val size: Int, val cycles: Int) {
     abstract fun bytes(): UByteArray
 }
 
-class LDr8r8(val r1: Reg8, val r2: Reg8) : Operation(1, 1) {
+class LD_r8_r8(val r1: Reg8, val r2: Reg8) : Operation(1, 1) {
     @ExperimentalUnsignedTypes
     override fun bytes(): UByteArray {
         val opcode: Int = (1 shl 6) or (r1.bitmask shl 3) or r2.bitmask
@@ -12,7 +12,7 @@ class LDr8r8(val r1: Reg8, val r2: Reg8) : Operation(1, 1) {
     }
 }
 
-class LDr8n8(val r: Reg8, val n: UByte) : Operation(2, 2) {
+class LD_r8_n8(val r: Reg8, val n: UByte) : Operation(2, 2) {
     @ExperimentalUnsignedTypes
     override fun bytes(): UByteArray {
         val opcode: Int = (r.bitmask shl 3) or 6
@@ -20,7 +20,7 @@ class LDr8n8(val r: Reg8, val n: UByte) : Operation(2, 2) {
     }
 }
 
-class LDr8HL(val r: Reg8) : Operation(1, 2) {
+class LD_r8_HL(val r: Reg8) : Operation(1, 2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         val opcode: Int = (1 shl 6) or (r.bitmask shl 3) or 6
@@ -28,7 +28,7 @@ class LDr8HL(val r: Reg8) : Operation(1, 2) {
     }
 }
 
-class LDr8IX(val r: Reg8, val offset: Byte): Operation(3,5) {
+class LD_r8_IX(val r: Reg8, val offset: Byte): Operation(3,5) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         val opcode: Int = (1 shl 6) or (r.bitmask shl 3) or 6
@@ -36,7 +36,7 @@ class LDr8IX(val r: Reg8, val offset: Byte): Operation(3,5) {
     }
 }
 
-class LDr8IY(val r: Reg8, val offset: Byte): Operation(3,5) {
+class LD_r8_IY(val r: Reg8, val offset: Byte): Operation(3,5) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         val opcode: Int = (1 shl 6) or (r.bitmask shl 3) or 6
@@ -44,7 +44,7 @@ class LDr8IY(val r: Reg8, val offset: Byte): Operation(3,5) {
     }
 }
 
-class LDHLr8(val r: Reg8) : Operation(1, 2) {
+class LD_HL_r8(val r: Reg8) : Operation(1, 2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         val opcode: Int = (7 shl 4) or r.bitmask
@@ -52,7 +52,7 @@ class LDHLr8(val r: Reg8) : Operation(1, 2) {
     }
 }
 
-class LDIXr8(val offset: Byte, val r: Reg8) : Operation(3, 5) {
+class LD_IX_r8(val offset: Byte, val r: Reg8) : Operation(3, 5) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         val opcode: Int = (7 shl 4) or r.bitmask
@@ -60,7 +60,7 @@ class LDIXr8(val offset: Byte, val r: Reg8) : Operation(3, 5) {
     }
 }
 
-class LDIYr8(val offset: Byte, val r: Reg8) : Operation(3, 5) {
+class LD_IY_r8(val offset: Byte, val r: Reg8) : Operation(3, 5) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         val opcode: Int = (7 shl 4) or r.bitmask
@@ -68,112 +68,112 @@ class LDIYr8(val offset: Byte, val r: Reg8) : Operation(3, 5) {
     }
 }
 
-class LDHLn8(val n: UByte) : Operation(2, 3) {
+class LD_HL_n8(val n: UByte) : Operation(2, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x36u, n)
     }
 }
 
-class LDIXn8(val offset: Byte, val n: UByte) : Operation(4, 5) {
+class LD_IX_n8(val offset: Byte, val n: UByte) : Operation(4, 5) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xDDu, 0x36u, offset.toUByte(), n)
     }
 }
 
-class LDIYn8(val offset: Byte, val n: UByte) : Operation(4, 5) {
+class LD_IY_n8(val offset: Byte, val n: UByte) : Operation(4, 5) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xFDu, 0x36u, offset.toUByte(), n)
     }
 }
 
-class LDABC : Operation(1, 2) {
+class LD_A_BC : Operation(1, 2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x0Au)
     }
 }
 
-class LDADE : Operation(1, 2) {
+class LD_A_DE : Operation(1, 2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x1Au)
     }
 }
 
-class LDAMM(val addr: UShort) : Operation(3,4) {
+class LD_A_MM(val addr: UShort) : Operation(3,4) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x3Au, lowByte(addr), hiByte(addr))
     }
 }
 
-class LDMMA(val addr: UShort) : Operation(3,4) {
+class LD_MM_A(val addr: UShort) : Operation(3,4) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x32u, lowByte(addr), hiByte(addr))
     }
 }
 
-class LDHLMM(val addr: UShort) : Operation(3,5) {
+class LD_HL_MM(val addr: UShort) : Operation(3,5) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x2Au, lowByte(addr), hiByte(addr))
     }
 }
 
-class LDMMHL(val addr: UShort) : Operation(3,5) {
+class LD_MM_HL(val addr: UShort) : Operation(3,5) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x22u, lowByte(addr), hiByte(addr))
     }
 }
 
-class LDBCA : Operation(1,2) {
+class LD_BC_A : Operation(1,2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x02u)
     }
 }
 
-class LDDEA : Operation(1,2) {
+class LD_DE_A : Operation(1,2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x12u)
     }
 }
 
-class LDAI : Operation(2, 2) {
+class LD_A_I : Operation(2, 2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xEDu, 0x57u)
     }
 }
 
-class LDAR : Operation(2, 2) {
+class LD_A_R : Operation(2, 2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xEDu, 0x5Fu)
     }
 }
 
-class LDIA : Operation(2, 2) {
+class LD_I_A : Operation(2, 2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xEDu, 0x47u)
     }
 }
 
-class LDRA : Operation(2, 2) {
+class LD_R_A : Operation(2, 2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xEDu, 0x4Fu)
     }
 }
 
-class LDr16n16(val r: Reg16, val imm: UShort) : Operation(3,2) {
+class LD_r16_n16(val r: Reg16, val imm: UShort) : Operation(3,2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         val opCode = ((r.bitmask shl 4) or 1).toUByte()
@@ -181,14 +181,55 @@ class LDr16n16(val r: Reg16, val imm: UShort) : Operation(3,2) {
     }
 }
 
-class LDrIn16(val r: RegI, val imm: UShort) : Operation(4,4) {
+class LD_rI_n16(val r: RegI, val imm: UShort) : Operation(4,4) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(r.prefix, 0x21u, lowByte(imm), hiByte(imm))
     }
 }
 
-class CPr8(val r: Reg8) : Operation(1, 1) {
+class LD_r16_MM(val r: Reg16, val addr: UShort) : Operation(4,6){
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        var prefix: UByte = 0xEDu
+        val opCode = ((r.bitmask shl 4) or 0x4B).toUByte()
+        return ubyteArrayOf(prefix, opCode, lowByte(addr), hiByte(addr))
+    }
+}
+
+class LD_rI_MM(val r: RegI, val addr: UShort) : Operation(4,6){
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        val opCode: UByte = 0x2Au
+        return ubyteArrayOf(r.prefix, opCode, lowByte(addr), hiByte(addr))
+    }
+}
+
+class LD_MM_r16(val addr: UShort, val r: Reg16) : Operation(4,6){
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        var prefix: UByte = 0xEDu
+        val opCode = ((r.bitmask shl 4) or 0x43).toUByte()
+        return ubyteArrayOf(prefix, opCode, lowByte(addr), hiByte(addr))
+    }
+}
+
+class LD_MM_rI(val addr: UShort, val r: RegI) : Operation(4,6){
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        val opCode: UByte = 0x22u
+        return ubyteArrayOf(r.prefix, opCode, lowByte(addr), hiByte(addr))
+    }
+}
+
+class LD_SP_HL: Operation(1, 1) {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun bytes(): UByteArray {
+        return ubyteArrayOf(0xF9u)
+    }
+}
+
+class CP_r8(val r: Reg8) : Operation(1, 1) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         val opCode: Int = 0xB8 or r.bitmask
@@ -196,21 +237,21 @@ class CPr8(val r: Reg8) : Operation(1, 1) {
     }
 }
 
-class CPn8(val n: UByte) : Operation(2, 2) {
+class CP_n8(val n: UByte) : Operation(2, 2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xFEu, n)
     }
 }
 
-class CPHL : Operation(1, 2) {
+class CP_HL : Operation(1, 2) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xBEu)
     }
 }
 
-class CPxx(indX: IndX) : Operation(3, 5) {
+class CP_xx(indX: IndX) : Operation(3, 5) {
     val prefix: UByte = indX.r.prefix
     val offset: Byte = indX.offset
 
@@ -220,56 +261,56 @@ class CPxx(indX: IndX) : Operation(3, 5) {
     }
 }
 
-class JRNZ(val offset: Byte) : Operation(2, 3) {
+class JR_NZ(val offset: Byte) : Operation(2, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x20u, offset.toUByte())
     }
 }
 
-class JRZ(val offset: Byte) : Operation(2, 3) {
+class JR_Z(val offset: Byte) : Operation(2, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x28u, offset.toUByte())
     }
 }
 
-class JRC(val offset: Byte) : Operation(2, 3) {
+class JR_C(val offset: Byte) : Operation(2, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x38u, offset.toUByte())
     }
 }
 
-class JRNC(val offset: Byte) : Operation(2, 3) {
+class JR_NC(val offset: Byte) : Operation(2, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0x30u, offset.toUByte())
     }
 }
 
-class JPNZ(val addr: UShort) : Operation(3, 3) {
+class JP_NZ(val addr: UShort) : Operation(3, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xC2u, lowByte(addr), hiByte(addr))
     }
 }
 
-class JPZ(val addr: UShort) : Operation(3, 3) {
+class JP_Z(val addr: UShort) : Operation(3, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xCAu, lowByte(addr), hiByte(addr))
     }
 }
 
-class JPC(val addr: UShort) : Operation(3, 3) {
+class JP_C(val addr: UShort) : Operation(3, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xDAu, lowByte(addr), hiByte(addr))
     }
 }
 
-class JPNC(val addr: UShort) : Operation(3, 3) {
+class JP_NC(val addr: UShort) : Operation(3, 3) {
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun bytes(): UByteArray {
         return ubyteArrayOf(0xD2u, lowByte(addr), hiByte(addr))
